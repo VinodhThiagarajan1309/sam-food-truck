@@ -1,64 +1,54 @@
-const AWS = require('aws-sdk')
+const AWS = require('aws-sdk');
+const documentClient = new AWS.DynamoDB.DocumentClient();
 
-exports.handler = async (event, context, callback) => {
+exports.handler =  (event, context, callback) => {
   // Log the event argument for debugging and for use in local development.
   console.log(JSON.stringify(event, undefined, 2));
 
-  const tableName = process.env.TABLE_NAME;
-  const httpMethod = event.httpMethod; //POST
-  const requestId = event.requestContext.requestId;
-  const userId = "sampleUserUUID";
-  const orderTotal = 14.99;
+  // Get the http method
+  const httpMethod = event.httpMethod;
+  switch(httpMethod) {
+    case "POST":
+      createOrder(event,callback);
+      break;
+    default:
+      // code block
+  }
+};
 
-  const lineItems = [
-    {
-      itemId: "someUUID",
-      itemName : "Burger",
-      itemPrice: 2.99
-    },
-    {
-      itemId: "someUUID2",
-      itemName : "IceCream",
-      itemPrice: 3.99
-    },
-    {
-      itemId: "someUUID3",
-      itemName : "Coke",
-      itemPrice: 4.99
-    },
-  ];
+const createOrder = function (event,callback) {
+  console.log("Entered the order creation method");
+  // Get the order Id
+  const orderId = event.requestContext.requestId;
 
-  /**
-   * orderid
-   * userId
-   * list of items
-   * total
-   * orderstatus
-   *
-   */
-
-
+  // Create the Params object
   var params = {
-    TableName : tableName,
+    TableName : process.env.TABLE_NAME,
     Item: {
-      orderId: requestId,
-      userId: userId,
-      menuItems: lineItems,
-      orderTotal: orderTotal,
+      orderId: orderId,
+      userId: JSON.parse(event.body).userId,
+      menuItems: JSON.parse(event.body).lineItems,
+      orderTotal: JSON.parse(event.body).total,
       orderStatus: 'in-progress'
     }
   };
 
-  const documentClient = new AWS.DynamoDB.DocumentClient();
-
+  // Save the item to Dynamo
   documentClient.put(params, function(err, data) {
-    if (err) console.log(err);
-    else console.log(data);
+    if (err) {
+      console.log(err);
+      return callback(Error(err));
+    } else {
+      console.log(data);
+      const methodResponse = {
+        message: "The order was created successfully - " + orderId
+      }
+      const apiGatewayResponse = {
+        statusCode: 200,
+        body: JSON.stringify(methodResponse)
+      }
+      return callback(null,apiGatewayResponse);
+    }
   });
 
-  const sample = {
-    statusCode : 200,
-    body : " All Good Vinodh !!"
-  }
-  callback(null,sample);
 };
