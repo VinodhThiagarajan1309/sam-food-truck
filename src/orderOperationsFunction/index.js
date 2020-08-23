@@ -27,7 +27,7 @@ const createOrder = function (event,callback) {
     Item: {
       orderId: orderId,
       userId: JSON.parse(event.body).userId,
-      menuItems: JSON.parse(event.body).lineItems,
+      lineItems: JSON.parse(event.body).lineItems,
       orderTotal: JSON.parse(event.body).total,
       orderStatus: 'in-progress'
     }
