@@ -1,0 +1,47 @@
+{
+  "resource": "/order/{orderId}",
+  "path": "/order/3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "httpMethod": "PUT",
+  "headers": null,
+  "multiValueHeaders": null,
+  "queryStringParameters": null,
+  "multiValueQueryStringParameters": null,
+  "pathParameters": {
+    "orderId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  },
+  "stageVariables": null,
+  "requestContext": {
+    "resourceId": "z3paj2",
+    "resourcePath": "/order/{orderId}",
+    "httpMethod": "PUT",
+    "extendedRequestId": "RvolvF60oAMFtIw=",
+    "requestTime": "23/Aug/2020:22:31:00 +0000",
+    "path": "/order/{orderId}",
+    "accountId": "092233727337",
+    "protocol": "HTTP/1.1",
+    "stage": "test-invoke-stage",
+    "domainPrefix": "testPrefix",
+    "requestTimeEpoch": 1598221860687,
+    "requestId": "a6185f19-457c-48d1-926e-fe70057f460e",
+    "identity": {
+      "cognitoIdentityPoolId": null,
+      "cognitoIdentityId": null,
+      "apiKey": "test-invoke-api-key",
+      "principalOrgId": null,
+      "cognitoAuthenticationType": null,
+      "userArn": "arn:aws:iam::092233727337:root",
+      "apiKeyId": "test-invoke-api-key-id",
+      "userAgent": "aws-internal/3 aws-sdk-java/1.11.829 Linux/4.9.217-0.1.ac.205.84.332.metal1.x86_64 OpenJDK_64-Bit_Server_VM/25.262-b10 java/1.8.0_262 vendor/Oracle_Corporation",
+      "accountId": "092233727337",
+      "caller": "092233727337",
+      "sourceIp": "test-invoke-source-ip",
+      "accessKey": "ASIARK6MO7VUTTE7HTPF",
+      "cognitoAuthenticationProvider": null,
+      "user": "092233727337"
+    },
+    "domainName": "testPrefix.testDomainName",
+    "apiId": "e40u34vxi6"
+  },
+  "body": null,
+  "isBase64Encoded": false
+}
