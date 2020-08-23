@@ -1,0 +1,231 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  foodTruckApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${StackTagName} Environment ${EnvironmentTagName}
+        - ResourceName: foodTruckApi
+      StageName: !Ref EnvironmentAPIGatewayStageName
+      DefinitionBody:
+        swagger: '2.0'
+        info: {}
+        paths:
+          /user/{userId}:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${userOperationsFunction.Arn}/invocations
+              responses: {}
+            put:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${userOperationsFunction.Arn}/invocations
+              responses: {}
+          /user:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${userOperationsFunction.Arn}/invocations
+              responses: {}
+          /menuItem:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${menuItemOperationsFunction.Arn}/invocations
+              responses: {}
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${menuItemOperationsFunction.Arn}/invocations
+              responses: {}
+          /order:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${orderOperationsFunction.Arn}/invocations
+              responses: {}
+          /order/{orderId}:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${orderOperationsFunction.Arn}/invocations
+              responses: {}
+            put:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${orderOperationsFunction.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+      Cors:
+        AllowHeaders: '''Authorization,Content-Type'''
+        AllowOrigin: '''*'''
+  userOperationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-userOperationsFunction
+      Description: !Sub
+        - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+        - ResourceName: userOperationsFunction
+      CodeUri: src/userOperationsFunction
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AWSXrayWriteOnlyAccess
+        - DynamoDBCrudPolicy:
+            TableName: !Ref users
+      Events:
+        foodTruckApiPOSTuser:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: POST
+            RestApiId: !Ref foodTruckApi
+        foodTruckApiPUTuseruserId:
+          Type: Api
+          Properties:
+            Path: /user/{userId}
+            Method: PUT
+            RestApiId: !Ref foodTruckApi
+        foodTruckApiGETuseruserId:
+          Type: Api
+          Properties:
+            Path: /user/{userId}
+            Method: GET
+            RestApiId: !Ref foodTruckApi
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref users
+          TABLE_ARN: !GetAtt users.Arn
+  orderOperationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-orderOperationsFunction
+      Description: !Sub
+        - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+        - ResourceName: orderOperationsFunction
+      CodeUri: src/orderOperationsFunction
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AWSXrayWriteOnlyAccess
+        - DynamoDBCrudPolicy:
+            TableName: !Ref orders
+      Events:
+        foodTruckApiPOSTorder:
+          Type: Api
+          Properties:
+            Path: /order
+            Method: POST
+            RestApiId: !Ref foodTruckApi
+        foodTruckApiGETorderorderId:
+          Type: Api
+          Properties:
+            Path: /order/{orderId}
+            Method: GET
+            RestApiId: !Ref foodTruckApi
+        foodTruckApiPUTorderorderId:
+          Type: Api
+          Properties:
+            Path: /order/{orderId}
+            Method: PUT
+            RestApiId: !Ref foodTruckApi
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref orders
+          TABLE_ARN: !GetAtt orders.Arn
+  menuItemOperationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-menuItemOperationsFunct
+      Description: !Sub
+        - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+        - ResourceName: menuItemOperationsFunction
+      CodeUri: src/menuItemOperationsFunction
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AWSXrayWriteOnlyAccess
+        - DynamoDBCrudPolicy:
+            TableName: !Ref menuItems
+      Events:
+        foodTruckApiGETmenuItem:
+          Type: Api
+          Properties:
+            Path: /menuItem
+            Method: GET
+            RestApiId: !Ref foodTruckApi
+        foodTruckApiPOSTmenuItem:
+          Type: Api
+          Properties:
+            Path: /menuItem
+            Method: POST
+            RestApiId: !Ref foodTruckApi
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref menuItems
+          TABLE_ARN: !GetAtt menuItems.Arn
+  orders:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+  users:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+  menuItems:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: menuItem
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: menuItem
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+Parameters:
+  StackTagName:
+    Type: String
+    Description: Stack Name (injected by Stackery at deployment time)
+  EnvironmentTagName:
+    Type: String
+    Description: Environment Name (injected by Stackery at deployment time)
+  EnvironmentAPIGatewayStageName:
+    Type: String
+    Description: Environment name used for API Gateway Stage names (injected by Stackery at deployment time)

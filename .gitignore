@@ -1,0 +1,5 @@
+.stackery*
+.aws-sam
+.idea
+samconfig.toml
+
